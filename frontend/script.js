@@ -12,11 +12,15 @@
     const I18N = {
       pt: {
         "brand.name": "Dafix",
-        "panel.title": "A plataforma segura para gerir clientes e equipe.",
-        "panel.slogan": "Tecnologia confiável, experiência impecável. Tudo em um só lugar.",
-        "benefit.secure": "Plataforma 100% segura",
-        "benefit.crypto": "Criptografia de ponta a ponta",
-        "benefit.support": "Atendimento 24 horas",
+        "panel.eyebrow": "GESTÃO SEM COMPLICAÇÃO",
+        "panel.title": "Clientes e equipe, no mesmo lugar.",
+        "panel.slogan": "Um acesso simples para organizar informações e manter sua rotina em ordem.",
+        "panel.note.title": "Um só ambiente.",
+        "panel.note.body": "Acesso para clientes e equipe.",
+        "panel.footer.label": "UMA PLATAFORMA",
+        "benefit.secure": "Um acesso para cada perfil",
+        "benefit.crypto": "Informações organizadas em um só lugar",
+        "benefit.support": "Uma experiência simples para clientes e equipe",
         "stat.users.num": "+10.000",
         "stat.users.label": "usuários ativos",
         "stat.uptime.label": "disponibilidade",
@@ -37,7 +41,9 @@
         "field.name.label": "Nome completo",
         "field.name.ph": "Seu nome completo",
         "field.phone.label": "Telefone",
+        "field.phone.ph": "(11) 99999-9999",
         "field.cpf.label": "CPF",
+        "field.cpf.ph": "000.000.000-00",
         "field.spec.label": "Especialidade",
         "field.spec.ph": "Ex.: Suporte técnico",
         "field.area.label": "Área de atuação",
@@ -48,7 +54,7 @@
         "login.submit": "Entrar",
         "signup.terms": "Concordo com os Termos de Uso e a Política de Privacidade",
         "signup.submit": "Criar conta",
-        "legal.text": "Seus dados são protegidos e criptografados.",
+        "legal.text": "Acesse a Dafix com o perfil adequado para você.",
         "modal.title": "Recuperação de senha",
         "modal.desc": "Digite seu e-mail e enviaremos as instruções para redefinir sua senha.",
         "modal.cancel": "Cancelar",
@@ -81,11 +87,15 @@
       },
       en: {
         "brand.name": "Dafix",
-        "panel.title": "The secure platform to manage clients and team.",
-        "panel.slogan": "Reliable technology, flawless experience. All in one place.",
-        "benefit.secure": "100% secure platform",
-        "benefit.crypto": "End-to-end encryption",
-        "benefit.support": "24-hour support",
+        "panel.eyebrow": "STRAIGHTFORWARD MANAGEMENT",
+        "panel.title": "Clients and team, all in one place.",
+        "panel.slogan": "One simple access point to organize information and keep your day moving.",
+        "panel.note.title": "One shared workspace.",
+        "panel.note.body": "Access for clients and team members.",
+        "panel.footer.label": "A PLATFORM BY",
+        "benefit.secure": "A dedicated access for each profile",
+        "benefit.crypto": "Information organized in one place",
+        "benefit.support": "A straightforward experience for clients and team",
         "stat.users.num": "+10,000",
         "stat.users.label": "active users",
         "stat.uptime.label": "uptime",
@@ -106,7 +116,9 @@
         "field.name.label": "Full name",
         "field.name.ph": "Your full name",
         "field.phone.label": "Phone",
+        "field.phone.ph": "(11) 99999-9999",
         "field.cpf.label": "CPF",
+        "field.cpf.ph": "000.000.000-00",
         "field.spec.label": "Specialty",
         "field.spec.ph": "e.g. Technical support",
         "field.area.label": "Area of work",
@@ -117,7 +129,7 @@
         "login.submit": "Sign in",
         "signup.terms": "I agree to the Terms of Use and Privacy Policy",
         "signup.submit": "Create account",
-        "legal.text": "Your data is protected and encrypted.",
+        "legal.text": "Choose the profile that matches your access.",
         "modal.title": "Password recovery",
         "modal.desc": "Enter your email and we'll send instructions to reset your password.",
         "modal.cancel": "Cancel",
@@ -152,8 +164,8 @@
   
     /* ----------------- State ----------------- */
     const state = {
-      lang: localStorage.getItem("dafix_lang") || "pt",
-      theme: localStorage.getItem("dafix_theme") || "light",
+      lang: ["pt", "en"].includes(localStorage.getItem("dafix_lang")) ? localStorage.getItem("dafix_lang") : "pt",
+      theme: ["light", "dark"].includes(localStorage.getItem("dafix_theme")) ? localStorage.getItem("dafix_theme") : "light",
       tab: "login",       // login | signup
       profile: "cliente", // cliente | funcionario
     };
@@ -166,7 +178,7 @@
     /* ----------------- Data loading ----------------- */
     async function loadData() {
       try {
-        const res = await fetch("/data.json", { cache: "no-store" });
+        const res = await fetch("data.json", { cache: "no-store" });
         DATA = await res.json();
       } catch (e) {
         DATA = { config: { sistema: "Dafix" }, clientes: [], funcionarios: [], mensagens: { pt: {}, en: {} } };
@@ -200,6 +212,8 @@
       $$("[data-i18n]").forEach((el) => { el.textContent = t(el.getAttribute("data-i18n")); });
       $$("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.getAttribute("data-i18n-ph")); });
       $("#langLabel").textContent = state.lang.toUpperCase();
+      $("#langToggle").setAttribute("aria-label", state.lang === "pt" ? "Mudar idioma para inglês" : "Switch language to Portuguese");
+      applyTheme();
       refreshDynamicTexts();
     }
   
@@ -224,7 +238,11 @@
     /* ----------------- Theme ----------------- */
     function applyTheme() {
       document.documentElement.setAttribute("data-theme", state.theme);
-      $("#themeToggle").setAttribute("aria-label", state.theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro");
+      $("#themeToggle").setAttribute("aria-label", state.lang === "pt"
+        ? (state.theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro")
+        : (state.theme === "dark" ? "Switch to light theme" : "Switch to dark theme"));
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.setAttribute("content", state.theme === "dark" ? "#111612" : "#203b30");
     }
   
     /* ----------------- Tabs ----------------- */
@@ -360,9 +378,9 @@
       if (/[^A-Za-z0-9]/.test(v)) score++;
       const bar = wrap.querySelector(".strength__bar");
       const label = wrap.querySelector("[data-strength-label]");
-      let w = "33%", c = "var(--red-500)", key = "strength.weak";
-      if (score >= 4) { w = "100%"; c = "var(--green-500)"; key = "strength.strong"; }
-      else if (score >= 2) { w = "66%"; c = "var(--orange-500)"; key = "strength.medium"; }
+      let w = "33%", c = "var(--red)", key = "strength.weak";
+      if (score >= 4) { w = "100%"; c = "var(--green)"; key = "strength.strong"; }
+      else if (score >= 2) { w = "66%"; c = "var(--accent)"; key = "strength.medium"; }
       bar.style.setProperty("--w", w);
       bar.style.setProperty("--c", c);
       label.textContent = t(key);
@@ -371,22 +389,53 @@
     /* ----------------- Toasts ----------------- */
     function toast(type, title, message) {
       const wrap = $("#toasts");
+      if (!wrap) return;
+
       const el = document.createElement("div");
       el.className = `toast toast--${type}`;
       el.setAttribute("data-testid", "toast");
+      el.setAttribute("role", "status");
+      el.tabIndex = 0;
+
       const icons = {
         success: '<path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>',
         error: '<path fill="currentColor" d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/>',
         info: '<path fill="currentColor" d="M11 7h2v2h-2V7Zm0 4h2v6h-2v-6Zm1-9a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"/>'
       };
-      el.innerHTML = `<span class="toast__ic"><svg viewBox="0 0 24 24" width="18" height="18">${icons[type] || icons.info}</svg></span>
-        <div class="toast__body"><strong>${title}</strong><span>${message}</span></div>`;
+
+      const icon = document.createElement("span");
+      icon.className = "toast__ic";
+      icon.setAttribute("aria-hidden", "true");
+      icon.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${icons[type] || icons.info}</svg>`;
+
+      const body = document.createElement("div");
+      body.className = "toast__body";
+      const titleEl = document.createElement("strong");
+      titleEl.textContent = String(title ?? "");
+      const messageEl = document.createElement("span");
+      messageEl.textContent = String(message ?? "");
+      body.append(titleEl, messageEl);
+      el.append(icon, body);
       wrap.appendChild(el);
-      const remove = () => { el.classList.add("is-out"); setTimeout(() => el.remove(), 320); };
-      setTimeout(remove, 4200);
-      el.addEventListener("click", remove);
+
+      let removed = false;
+      const remove = () => {
+        if (removed) return;
+        removed = true;
+        el.classList.add("is-out");
+        setTimeout(() => el.remove(), 180);
+      };
+      const timer = setTimeout(remove, 4200);
+      el.addEventListener("click", () => { clearTimeout(timer); remove(); });
+      el.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          clearTimeout(timer);
+          remove();
+        }
+      });
     }
-  
+
     /* ----------------- Button loading ----------------- */
     function withLoading(btn, fn, delay = 1100) {
       btn.classList.add("is-loading");
@@ -455,6 +504,7 @@ function handleLogin() {
 
     /* 1) Lembrar e-mail */
     if ($("#remember").checked) localStorage.setItem("dafix_last_email", email);
+    else localStorage.removeItem("dafix_last_email");
 
     /* 2) Guardar sessão para os dashboards lerem quem entrou */
     localStorage.setItem("dafix_session", JSON.stringify({
@@ -618,6 +668,9 @@ function handleLogin() {
   
     /* ----------------- Init ----------------- */
     async function init() {
+      if (new URLSearchParams(window.location.search).get("dev") === "1") {
+        document.body.classList.add("show-dev-shortcuts");
+      }
       applyTheme();
       bind();
       setTab("login");
