@@ -426,24 +426,52 @@
       return ok;
     }
   
-    function handleLogin() {
-      const form = $("#panel-login");
-      const btn = $("[data-submit]", form);
-      if (!validateForm(form)) { toast("error", t("toast.error.title"), msg("formErro")); return; }
-      const email = $("#login-email").value.trim().toLowerCase();
-      const pw = $("#login-password").value;
-      const group = state.profile === "cliente" ? "clientes" : "funcionarios";
-      withLoading(btn, () => {
-        const list = allUsers(group);
-        const found = list.find((u) => (u.email || "").toLowerCase() === email);
-        if (!found) { toast("error", t("toast.error.title"), msg("loginPerfilErro")); return; }
-        if (found.senha !== pw) { toast("error", t("toast.error.title"), msg("loginErro")); return; }
-        if ($("#remember").checked) localStorage.setItem("dafix_last_email", email);
-        toast("success", t("toast.welcome.title"), msg("loginSucesso", { nome: found.nome }));
-        form.reset();
-        $$(".field", form).forEach((f) => f.classList.remove("is-valid", "is-invalid"));
-      });
-    }
+    /* ----------------- Rotas pós-login ----------------- */
+const ROUTES = {
+  cliente:     "/cliente/index.html",
+  funcionario: "/funcionario/funcionario-dashboard.html",
+  admin:       "/admin/dashboard.html",           // opcional
+};
+
+function handleLogin() {
+  const form = $("#panel-login");
+  const btn  = $("[data-submit]", form);
+
+  if (!validateForm(form)) {
+    toast("error", t("toast.error.title"), msg("formErro"));
+    return;
+  }
+
+  const email = $("#login-email").value.trim().toLowerCase();
+  const pw    = $("#login-password").value;
+  const group = state.profile === "cliente" ? "clientes" : "funcionarios";
+
+  withLoading(btn, () => {
+    const list  = allUsers(group);
+    const found = list.find((u) => (u.email || "").toLowerCase() === email);
+
+    if (!found)       { toast("error", t("toast.error.title"), msg("loginPerfilErro")); return; }
+    if (found.senha !== pw) { toast("error", t("toast.error.title"), msg("loginErro")); return; }
+
+    /* 1) Lembrar e-mail */
+    if ($("#remember").checked) localStorage.setItem("dafix_last_email", email);
+
+    /* 2) Guardar sessão para os dashboards lerem quem entrou */
+    localStorage.setItem("dafix_session", JSON.stringify({
+      nome:   found.nome,
+      email:  found.email,
+      perfil: state.profile,
+      loginAt: Date.now(),
+    }));
+
+    /* 3) Sucesso */
+    toast("success", t("toast.welcome.title"), msg("loginSucesso", { nome: found.nome }));
+
+    /* 4) Redirecionar (dá ~900ms para o toast aparecer) */
+    const destino = ROUTES[state.profile] || "/";
+    setTimeout(() => { window.location.href = destino; }, 900);
+  });
+}
   
     function handleSignup() {
       const form = $("#panel-signup");
