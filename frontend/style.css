@@ -101,13 +101,13 @@
   
   /* ---------- Topbar ---------- */
   .topbar {
-    position: fixed; inset: 0 0 auto 0; z-index: 30;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 18px clamp(18px, 4vw, 42px);
-    padding-top: max(18px, env(safe-area-inset-top));
-    padding-left: max(clamp(18px, 4vw, 42px), env(safe-area-inset-left));
-    padding-right: max(clamp(18px, 4vw, 42px), env(safe-area-inset-right));
-    pointer-events: none;
+  position: fixed; inset: 0 0 auto 0; z-index: 30;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 18px clamp(18px, 4vw, 42px);
+  padding-top: max(18px, env(safe-area-inset-top));
+  padding-left: max(clamp(18px, 4vw, 42px), env(safe-area-inset-left));
+  padding-right: max(clamp(18px, 4vw, 42px), env(safe-area-inset-right));
+  pointer-events: none;
   }
   .topbar > * { pointer-events: auto; }
   .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
