@@ -294,7 +294,8 @@ input:focus-visible {
 
 .panel__logo {
   object-fit: cover;
-  background: rgb(255 255 255 / 8%);
+  background: transparent;
+  mix-blend-mode: screen;
 }
 
 .panel__logo-fallback {
