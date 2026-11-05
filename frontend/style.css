@@ -293,7 +293,7 @@ input:focus-visible {
 }
 
 .panel__logo {
-  object-fit: cover;
+  object-fit: contain;
   background: transparent;
   mix-blend-mode: screen;
 }
